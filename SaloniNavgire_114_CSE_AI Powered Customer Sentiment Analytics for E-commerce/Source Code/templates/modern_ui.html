@@ -1,0 +1,919 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SentimentPulse - AI Sentiment Analysis</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;800&family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab);
+            background-size: 400% 400%;
+            animation: gradientShift 15s ease infinite;
+            min-height: 100vh;
+            transition: background 0.3s ease;
+        }
+
+        body.light-mode {
+            background: linear-gradient(-45deg, #ffd89b, #19547b, #ffb347, #ff6347);
+            background-size: 400% 400%;
+            animation: gradientShift 15s ease infinite;
+        }
+
+        body.dark-mode {
+            background: linear-gradient(-45deg, #0a0e27, #16213e, #0f3460, #1a5984);
+            background-size: 400% 400%;
+            animation: gradientShift 15s ease infinite;
+        }
+
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        /* DARK MODE VARIABLES */
+        :root {
+            --bg-primary: #fff;
+            --bg-secondary: #f5f5f5;
+            --text-primary: #111;
+            --text-secondary: #666;
+            --border-color: #e0e0e0;
+            --card-bg: rgba(255, 255, 255, 0.95);
+            --shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        body.dark-mode {
+            --bg-primary: #0f1419;
+            --bg-secondary: #1a1f2e;
+            --text-primary: #fff;
+            --text-secondary: #b0b0b0;
+            --border-color: #333;
+            --card-bg: rgba(26, 31, 46, 0.95);
+            --shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        }
+
+        /* THEME MODE TOGGLE */
+        .theme-toggle {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            background: var(--card-bg);
+            border: 2px solid var(--border-color);
+            border-radius: 50px;
+            padding: 10px 20px;
+            cursor: pointer;
+            font-size: 18px;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--text-primary);
+        }
+
+        .theme-toggle:hover {
+            transform: scale(1.1);
+            box-shadow: var(--shadow);
+        }
+
+        /* HEADER */
+        header {
+            text-align: center;
+            padding: 60px 20px 40px;
+            color: #fff;
+        }
+
+        .logo {
+            font-size: 48px;
+            font-weight: 800;
+            margin-bottom: 10px;
+            font-family: 'Montserrat', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .tagline {
+            font-size: 18px;
+            opacity: 0.9;
+            font-weight: 300;
+            letter-spacing: 1px;
+        }
+
+        .typing-animation {
+            display: inline-block;
+            border-right: 3px solid #fff;
+            white-space: nowrap;
+            overflow: hidden;
+            animation: typing 3.5s steps(40, end), blink-caret 0.75s step-end infinite;
+        }
+
+        @keyframes typing {
+            from { width: 0; }
+            to { width: 100%; }
+        }
+
+        @keyframes blink-caret {
+            from, to { border-color: transparent; }
+            50% { border-color: #fff; }
+        }
+
+        /* ROTATING SENTIMENT TEXT */
+        .sentiment-rotator {
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 30px;
+        }
+
+        .rotating-text {
+            font-size: 28px;
+            font-weight: 700;
+            color: #fff;
+            animation: rotate 6s infinite;
+        }
+
+        @keyframes rotate {
+            0% {
+                opacity: 1;
+                transform: rotateY(0deg) scale(1);
+            }
+            25% {
+                opacity: 0;
+                transform: rotateY(90deg) scale(0.8);
+            }
+            26% {
+                opacity: 1;
+                transform: rotateY(-90deg) scale(0.8);
+            }
+            50% {
+                opacity: 1;
+                transform: rotateY(0deg) scale(1);
+            }
+            75% {
+                opacity: 0;
+                transform: rotateY(90deg) scale(0.8);
+            }
+            76% {
+                opacity: 1;
+                transform: rotateY(-90deg) scale(0.8);
+            }
+            100% {
+                opacity: 1;
+                transform: rotateY(0deg) scale(1);
+            }
+        }
+
+        /* MAIN CONTAINER */
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* INPUT SECTION */
+        .input-section {
+            background: var(--card-bg);
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: var(--shadow);
+            margin-bottom: 40px;
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            animation: slideUp 0.8s ease;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        .input-group label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: var(--text-primary);
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .input-group input,
+        .input-group textarea {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid var(--border-color);
+            border-radius: 12px;
+            font-family: 'Poppins', sans-serif;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+        }
+
+        .input-group input::placeholder,
+        .input-group textarea::placeholder {
+            color: var(--text-secondary);
+        }
+
+        .input-group input:focus,
+        .input-group textarea:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+            background: var(--card-bg);
+        }
+
+        .input-group textarea {
+            resize: vertical;
+            min-height: 120px;
+        }
+
+        .input-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        @media (max-width: 600px) {
+            .input-row {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* BUTTONS */
+        .btn {
+            padding: 14px 30px;
+            border: none;
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #fff;
+            width: 100%;
+            padding: 16px;
+            font-size: 15px;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 40px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-primary:active {
+            transform: translateY(-1px);
+        }
+
+        .btn-primary.loading {
+            opacity: 0.7;
+            cursor: not-allowed;
+        }
+
+        /* LOADING SPINNER */
+        .spinner {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top: 3px solid #fff;
+            animation: spin 1s linear infinite;
+            margin-right: 8px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* RESULT SECTION */
+        .result-section {
+            background: var(--card-bg);
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: var(--shadow);
+            margin-bottom: 40px;
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            display: none;
+            animation: slideUp 0.8s ease;
+        }
+
+        .result-section.show {
+            display: block;
+        }
+
+        .sentiment-result {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .sentiment-emoji {
+            font-size: 80px;
+            margin-bottom: 20px;
+            animation: bounce 0.6s ease;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-20px); }
+        }
+
+        .sentiment-label {
+            font-size: 32px;
+            font-weight: 800;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 10px;
+        }
+
+        .sentiment-score {
+            font-size: 18px;
+            color: var(--text-secondary);
+            margin-bottom: 20px;
+        }
+
+        .confidence-bar {
+            width: 100%;
+            height: 8px;
+            background: var(--bg-secondary);
+            border-radius: 10px;
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+
+        .confidence-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            border-radius: 10px;
+            animation: fillProgress 1s ease;
+        }
+
+        @keyframes fillProgress {
+            from { width: 0; }
+        }
+
+        .result-details {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin-top: 30px;
+        }
+
+        .detail-card {
+            background: var(--bg-secondary);
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+            transition: all 0.3s ease;
+            border: 2px solid var(--border-color);
+        }
+
+        .detail-card:hover {
+            transform: translateY(-5px);
+            border-color: #667eea;
+        }
+
+        .detail-label {
+            font-size: 12px;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 8px;
+        }
+
+        .detail-value {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        @media (max-width: 600px) {
+            .result-details {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* REVIEW CARDS */
+        .reviews-section {
+            margin-top: 40px;
+        }
+
+        .section-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 20px;
+        }
+
+        .review-card {
+            background: var(--card-bg);
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: var(--shadow);
+            border: 2px solid var(--border-color);
+            transition: all 0.3s ease;
+            animation: slideUp 0.8s ease;
+        }
+
+        .review-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+            border-color: #667eea;
+        }
+
+        .review-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+            gap: 12px;
+        }
+
+        .review-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-weight: 700;
+            font-size: 18px;
+        }
+
+        .review-info {
+            flex: 1;
+        }
+
+        .review-user {
+            font-weight: 600;
+            color: var(--text-primary);
+            display: block;
+        }
+
+        .review-date {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        .review-sentiment {
+            display: inline-block;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .sentiment-positive {
+            background: rgba(34, 197, 94, 0.2);
+            color: #22c55e;
+        }
+
+        .sentiment-negative {
+            background: rgba(239, 68, 68, 0.2);
+            color: #ef4444;
+        }
+
+        .sentiment-neutral {
+            background: rgba(168, 85, 247, 0.2);
+            color: #a855f7;
+        }
+
+        .review-text {
+            color: var(--text-primary);
+            line-height: 1.6;
+            margin-bottom: 15px;
+        }
+
+        .review-footer {
+            display: flex;
+            gap: 20px;
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        .review-stat {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            cursor: pointer;
+            transition: color 0.3s ease;
+        }
+
+        .review-stat:hover {
+            color: #667eea;
+        }
+
+        /* RESPONSIVE */
+        @media (max-width: 768px) {
+            header {
+                padding: 40px 20px 30px;
+            }
+
+            .logo {
+                font-size: 36px;
+            }
+
+            .tagline {
+                font-size: 14px;
+            }
+
+            .input-section {
+                padding: 25px;
+            }
+
+            .sentiment-emoji {
+                font-size: 60px;
+            }
+
+            .sentiment-label {
+                font-size: 24px;
+            }
+        }
+
+        /* UTILITIES */
+        .hidden {
+            display: none !important;
+        }
+
+        .text-center {
+            text-align: center;
+        }
+    </style>
+</head>
+<body class="light-mode">
+    <!-- THEME TOGGLE -->
+    <button class="theme-toggle" id="themeToggle">
+        <span id="themeIcon">🌙</span>
+        <span id="themeText">Dark</span>
+    </button>
+
+    <!-- HEADER -->
+    <header>
+        <h1 class="logo">✨ SentimentPulse</h1>
+        <p class="tagline" style="font-size: 24px;">
+            <span class="typing-animation">Analyze Review Sentiment with AI</span>
+        </p>
+        
+        <div class="sentiment-rotator">
+            <div class="rotating-text" id="rotatingText">Positive</div>
+        </div>
+    </header>
+
+    <!-- MAIN CONTENT -->
+    <div class="container">
+        <!-- INPUT SECTION -->
+        <div class="input-section">
+            <div class="input-row">
+                <div class="input-group">
+                    <label for="urlInput">📎 Product URL</label>
+                    <input 
+                        type="url" 
+                        id="urlInput" 
+                        placeholder="Enter product URL (e.g., amazon.com/dp/...)"
+                    >
+                </div>
+                <div class="input-group">
+                    <label for="reviewInput">💬 Review Text</label>
+                    <input 
+                        type="text" 
+                        id="reviewInput" 
+                        placeholder="Or paste a review here..."
+                    >
+                </div>
+            </div>
+
+            <div class="input-group">
+                <label for="textareaInput">📝 Full Review (Optional)</label>
+                <textarea 
+                    id="textareaInput" 
+                    placeholder="Paste your detailed review here for analysis..."
+                ></textarea>
+            </div>
+
+            <button class="btn btn-primary" id="analyzeBtn">
+                🚀 Analyze Sentiment
+            </button>
+        </div>
+
+        <!-- RESULT SECTION -->
+        <div class="result-section" id="resultSection">
+            <div class="sentiment-result">
+                <div class="sentiment-emoji" id="sentimentEmoji">😊</div>
+                <div class="sentiment-label" id="sentimentLabel">Positive</div>
+                <div class="sentiment-score" id="sentimentScore">Confidence: 85%</div>
+                
+                <div class="confidence-bar">
+                    <div class="confidence-fill" id="confidenceFill" style="width: 85%;"></div>
+                </div>
+
+                <div class="result-details">
+                    <div class="detail-card">
+                        <div class="detail-label">Positive</div>
+                        <div class="detail-value" id="positiveScore">45%</div>
+                    </div>
+                    <div class="detail-card">
+                        <div class="detail-label">Neutral</div>
+                        <div class="detail-value" id="neutralScore">30%</div>
+                    </div>
+                    <div class="detail-card">
+                        <div class="detail-label">Negative</div>
+                        <div class="detail-value" id="negativeScore">25%</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- REVIEWS SECTION -->
+            <div class="reviews-section">
+                <div style="display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:12px; margin-bottom:18px;">
+                    <h2 class="section-title">📊 Sample Reviews</h2>
+                    <button class="btn btn-secondary" id="downloadPdfBtn" type="button" style="min-width:180px;">Download PDF</button>
+                </div>
+                
+                <div class="review-card">
+                    <div class="review-header">
+                        <div class="review-avatar">J</div>
+                        <div class="review-info">
+                            <span class="review-user">John Doe</span>
+                            <span class="review-date">2 days ago</span>
+                        </div>
+                        <span class="review-sentiment sentiment-positive">Positive</span>
+                    </div>
+                    <div class="review-text">Absolutely amazing product! Exceeded all my expectations. The quality is exceptional and customer service was outstanding. Highly recommend to everyone!</div>
+                    <div class="review-footer">
+                        <span class="review-stat">👍 324</span>
+                        <span class="review-stat">💬 45</span>
+                        <span class="review-stat">🔄 12</span>
+                    </div>
+                </div>
+
+                <div class="review-card">
+                    <div class="review-header">
+                        <div class="review-avatar">S</div>
+                        <div class="review-info">
+                            <span class="review-user">Sarah Smith</span>
+                            <span class="review-date">1 week ago</span>
+                        </div>
+                        <span class="review-sentiment sentiment-neutral">Neutral</span>
+                    </div>
+                    <div class="review-text">Good product overall. It works as described, though I was expecting a bit more. Average quality compared to competitors, but decent value for money.</div>
+                    <div class="review-footer">
+                        <span class="review-stat">👍 156</span>
+                        <span class="review-stat">💬 28</span>
+                        <span class="review-stat">🔄 8</span>
+                    </div>
+                </div>
+
+                <div class="review-card">
+                    <div class="review-header">
+                        <div class="review-avatar">M</div>
+                        <div class="review-info">
+                            <span class="review-user">Mike Johnson</span>
+                            <span class="review-date">3 days ago</span>
+                        </div>
+                        <span class="review-sentiment sentiment-negative">Negative</span>
+                    </div>
+                    <div class="review-text">Disappointed with this purchase. The product broke after just one week. Customer support was unhelpful. Would not recommend to anyone. Very poor quality overall.</div>
+                    <div class="review-footer">
+                        <span class="review-stat">👍 23</span>
+                        <span class="review-stat">💬 67</span>
+                        <span class="review-stat">🔄 34</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.3/html2pdf.bundle.min.js" integrity="sha512-YcsIPsc2UUCnRte6GcQ64ohgK7k1vJ3FXvVbAED4ffYbcB5/BMN7bJLxv1H0Xx5EkYzuS5Cib7cH5pX6B/z7ug==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script>
+        // ========== THEME TOGGLE ==========
+        const themeToggle = document.getElementById('themeToggle');
+        const body = document.body;
+        const themeIcon = document.getElementById('themeIcon');
+        const themeText = document.getElementById('themeText');
+
+        // Check saved theme preference
+        const savedTheme = localStorage.getItem('theme') || 'light-mode';
+        body.className = savedTheme;
+        updateThemeButton();
+
+        themeToggle.addEventListener('click', () => {
+            if (body.classList.contains('light-mode')) {
+                body.classList.remove('light-mode');
+                body.classList.add('dark-mode');
+                localStorage.setItem('theme', 'dark-mode');
+            } else {
+                body.classList.remove('dark-mode');
+                body.classList.add('light-mode');
+                localStorage.setItem('theme', 'light-mode');
+            }
+            updateThemeButton();
+        });
+
+        function updateThemeButton() {
+            if (body.classList.contains('dark-mode')) {
+                themeIcon.textContent = '☀️';
+                themeText.textContent = 'Light';
+            } else {
+                themeIcon.textContent = '🌙';
+                themeText.textContent = 'Dark';
+            }
+        }
+
+        // ========== ROTATING SENTIMENT TEXT ==========
+        const sentiments = ['Positive', 'Neutral', 'Negative', 'Amazing!'];
+        let sentimentIndex = 0;
+        const rotatingText = document.getElementById('rotatingText');
+
+        setInterval(() => {
+            sentimentIndex = (sentimentIndex + 1) % sentiments.length;
+            rotatingText.textContent = sentiments[sentimentIndex];
+        }, 1500);
+
+        // ========== ANALYZE BUTTON ==========
+        const analyzeBtn = document.getElementById('analyzeBtn');
+        const resultSection = document.getElementById('resultSection');
+        const downloadPdfBtn = document.getElementById('downloadPdfBtn');
+        const urlInput = document.getElementById('urlInput');
+        const reviewInput = document.getElementById('reviewInput');
+        const textareaInput = document.getElementById('textareaInput');
+
+        analyzeBtn.addEventListener('click', () => {
+            const hasInput = urlInput.value || reviewInput.value || textareaInput.value;
+
+            if (!hasInput) {
+                alert('Please enter a URL or review text to analyze!');
+                return;
+            }
+
+            // Show loading state
+            analyzeBtn.classList.add('loading');
+            analyzeBtn.innerHTML = '<span class="spinner"></span>Analyzing...';
+            analyzeBtn.disabled = true;
+
+            // Simulate API call
+            setTimeout(() => {
+                // Generate random sentiment scores
+                const scores = generateRandomScores();
+                displayResults(scores);
+
+                // Reset button
+                analyzeBtn.classList.remove('loading');
+                analyzeBtn.innerHTML = '🚀 Analyze Sentiment';
+                analyzeBtn.disabled = false;
+
+                // Show result section
+                resultSection.classList.add('show');
+                resultSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                if (downloadPdfBtn) {
+                    downloadProductReport();
+                }
+            }, 2000);
+        });
+
+        function downloadProductReport() {
+            const element = resultSection;
+            if (!element || typeof html2pdf !== 'function') {
+                return;
+            }
+            const opt = {
+                margin: 0.35,
+                filename: 'product_analysis_result.pdf',
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { scale: 2, useCORS: true },
+                jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' }
+            };
+            html2pdf().set(opt).from(element).save();
+        }
+
+        if (downloadPdfBtn) {
+            downloadPdfBtn.addEventListener('click', downloadProductReport);
+        }
+
+        function generateRandomScores() {
+            const positive = Math.floor(Math.random() * 100);
+            const negative = Math.floor(Math.random() * (100 - positive));
+            const neutral = 100 - positive - negative;
+
+            return {
+                positive,
+                neutral,
+                negative,
+                dominant: getDominantSentiment(positive, neutral, negative)
+            };
+        }
+
+        function getDominantSentiment(positive, neutral, negative) {
+            const scores = {
+                'positive': positive,
+                'neutral': neutral,
+                'negative': negative
+            };
+            return Object.keys(scores).reduce((a, b) => scores[a] > scores[b] ? a : b);
+        }
+
+        function displayResults(scores) {
+            const sentimentEmojis = {
+                'positive': '😊',
+                'neutral': '😐',
+                'negative': '😞'
+            };
+
+            const sentimentLabels = {
+                'positive': 'Positive',
+                'neutral': 'Neutral',
+                'negative': 'Negative'
+            };
+
+            const dominant = scores.dominant;
+
+            // Update emoji and label
+            document.getElementById('sentimentEmoji').textContent = sentimentEmojis[dominant];
+            document.getElementById('sentimentLabel').textContent = sentimentLabels[dominant];
+
+            // Update confidence
+            const confidence = scores[dominant];
+            document.getElementById('sentimentScore').textContent = `Confidence: ${confidence}%`;
+            document.getElementById('confidenceFill').style.width = `${confidence}%`;
+
+            // Update detail cards
+            document.getElementById('positiveScore').textContent = `${scores.positive}%`;
+            document.getElementById('neutralScore').textContent = `${scores.neutral}%`;
+            document.getElementById('negativeScore').textContent = `${scores.negative}%`;
+        }
+
+        // ========== KEYBOARD SHORTCUTS ==========
+        document.addEventListener('keydown', (e) => {
+            if (e.ctrlKey && e.key === 'Enter') {
+                analyzeBtn.click();
+            }
+        });
+
+        // ========== ENTER KEY FUNCTIONALITY ==========
+        textareaInput.addEventListener('keydown', (e) => {
+            if (e.ctrlKey && e.key === 'Enter') {
+                analyzeBtn.click();
+            }
+        });
+
+        // ========== INITIAL SAMPLE DISPLAY ==========
+        window.addEventListener('load', () => {
+            // Display sample results on load
+            setTimeout(() => {
+                const initialScores = {
+                    positive: 72,
+                    neutral: 18,
+                    negative: 10,
+                    dominant: 'positive'
+                };
+                displayResults(initialScores);
+                resultSection.classList.add('show');
+            }, 500);
+        });
+    </script>
+</body>
+</html>

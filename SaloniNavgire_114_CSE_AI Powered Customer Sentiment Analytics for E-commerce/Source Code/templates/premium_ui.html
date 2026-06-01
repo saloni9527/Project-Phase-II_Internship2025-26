@@ -1,0 +1,1146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SentimentPulse Pro - Advanced Sentiment Analysis</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&family=Montserrat:wght@400;500;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        :root {
+            --color-primary: #667eea;
+            --color-secondary: #764ba2;
+            --color-accent: #f093fb;
+            --color-positive: #22c55e;
+            --color-neutral: #a855f7;
+            --color-negative: #ef4444;
+            --radius-sm: 8px;
+            --radius-md: 12px;
+            --radius-lg: 16px;
+            --radius-xl: 20px;
+            --transition-fast: 0.2s ease;
+            --transition-base: 0.3s ease;
+            --transition-slow: 0.5s ease;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab);
+            background-size: 400% 400%;
+            animation: gradientShift 20s ease infinite;
+            min-height: 100vh;
+            color: #111;
+            overflow-x: hidden;
+        }
+
+        body.dark-mode {
+            background: linear-gradient(-45deg, #0f1419, #1a1f2e, #0f3460, #1a5984);
+            background-size: 400% 400%;
+            animation: gradientShift 20s ease infinite;
+            color: #fff;
+        }
+
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        /* CSS VARIABLES FOR DARK MODE */
+        :root {
+            --bg-primary: #fff;
+            --bg-secondary: #f9fafb;
+            --bg-tertiary: #f3f4f6;
+            --text-primary: #111827;
+            --text-secondary: #6b7280;
+            --text-tertiary: #9ca3af;
+            --border-color: #e5e7eb;
+            --card-bg: rgba(255, 255, 255, 0.97);
+            --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.08);
+            --shadow-lg: 0 10px 30px rgba(0, 0, 0, 0.12);
+            --shadow-xl: 0 20px 50px rgba(0, 0, 0, 0.15);
+        }
+
+        body.dark-mode {
+            --bg-primary: #0f1419;
+            --bg-secondary: #1a1f2e;
+            --bg-tertiary: #252d3d;
+            --text-primary: #f3f4f6;
+            --text-secondary: #d1d5db;
+            --text-tertiary: #9ca3af;
+            --border-color: #374151;
+            --card-bg: rgba(26, 31, 46, 0.97);
+            --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
+            --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.4);
+            --shadow-lg: 0 10px 30px rgba(0, 0, 0, 0.5);
+            --shadow-xl: 0 20px 50px rgba(0, 0, 0, 0.6);
+        }
+
+        body {
+            background-attachment: fixed;
+        }
+
+        /* THEME TOGGLE */
+        .theme-toggle {
+            position: fixed;
+            top: 24px;
+            right: 24px;
+            z-index: 1000;
+            background: var(--card-bg);
+            border: 2px solid var(--border-color);
+            border-radius: 50px;
+            padding: 12px 24px;
+            cursor: pointer;
+            font-size: 18px;
+            transition: all var(--transition-base);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--text-primary);
+            font-weight: 600;
+            backdrop-filter: blur(10px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .theme-toggle:hover {
+            transform: scale(1.05);
+            box-shadow: var(--shadow-lg);
+            border-color: var(--color-primary);
+        }
+
+        .theme-toggle:active {
+            transform: scale(0.98);
+        }
+
+        /* NAVBAR */
+        nav {
+            background: rgba(255, 255, 255, 0.3);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border-color);
+            padding: 16px 0;
+            position: sticky;
+            top: 0;
+            z-index: 900;
+        }
+
+        nav.dark-mode {
+            background: rgba(15, 20, 25, 0.3);
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .nav-brand {
+            font-size: 24px;
+            font-weight: 800;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-family: 'Montserrat', sans-serif;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 30px;
+            list-style: none;
+        }
+
+        .nav-links a {
+            color: var(--text-primary);
+            text-decoration: none;
+            font-weight: 500;
+            transition: color var(--transition-fast);
+            position: relative;
+        }
+
+        .nav-links a:hover {
+            color: var(--color-primary);
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: -4px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--color-primary);
+            transition: width var(--transition-base);
+        }
+
+        .nav-links a:hover::after {
+            width: 100%;
+        }
+
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+            }
+        }
+
+        /* HEADER */
+        header {
+            text-align: center;
+            padding: 80px 20px 60px;
+            color: #fff;
+            position: relative;
+            overflow: hidden;
+        }
+
+        header::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(circle at 20% 50%, rgba(102, 126, 234, 0.1) 0%, transparent 50%),
+                        radial-gradient(circle at 80% 80%, rgba(240, 147, 251, 0.1) 0%, transparent 50%);
+            pointer-events: none;
+        }
+
+        .logo {
+            font-size: 56px;
+            font-weight: 900;
+            margin-bottom: 16px;
+            font-family: 'Montserrat', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: float 4s ease-in-out infinite;
+            letter-spacing: -1px;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-15px); }
+        }
+
+        .tagline {
+            font-size: 24px;
+            font-weight: 300;
+            letter-spacing: 0.5px;
+            margin-bottom: 30px;
+        }
+
+        .typing-animation {
+            display: inline-block;
+            border-right: 3px solid #fff;
+            white-space: nowrap;
+            overflow: hidden;
+            animation: typing 4s steps(50, end), blink 0.75s step-end infinite;
+            font-weight: 600;
+        }
+
+        @keyframes typing {
+            from { width: 0; }
+            to { width: 100%; }
+        }
+
+        @keyframes blink {
+            from, to { border-color: transparent; }
+            50% { border-color: #fff; }
+        }
+
+        /* SENTIMENT ROTATOR */
+        .sentiment-rotator {
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 30px 0;
+            perspective: 1000px;
+        }
+
+        .rotating-text {
+            font-size: 32px;
+            font-weight: 800;
+            color: #fff;
+            animation: rotate3d 6s infinite;
+            font-family: 'Montserrat', sans-serif;
+        }
+
+        @keyframes rotate3d {
+            0% {
+                opacity: 1;
+                transform: rotateY(0deg) scale(1);
+            }
+            20% {
+                opacity: 1;
+                transform: rotateY(0deg) scale(1);
+            }
+            25% {
+                opacity: 0;
+                transform: rotateY(90deg) scale(0.5);
+            }
+            26% {
+                opacity: 0;
+                transform: rotateY(-90deg) scale(0.5);
+            }
+            30% {
+                opacity: 1;
+                transform: rotateY(0deg) scale(1);
+            }
+            50% {
+                opacity: 1;
+                transform: rotateY(0deg) scale(1);
+            }
+            75% {
+                opacity: 0;
+                transform: rotateY(90deg) scale(0.5);
+            }
+            76% {
+                opacity: 0;
+                transform: rotateY(-90deg) scale(0.5);
+            }
+            80% {
+                opacity: 1;
+                transform: rotateY(0deg) scale(1);
+            }
+            100% {
+                opacity: 1;
+                transform: rotateY(0deg) scale(1);
+            }
+        }
+
+        /* CONTAINER */
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* INPUT SECTION */
+        .input-section {
+            background: var(--card-bg);
+            border-radius: var(--radius-xl);
+            padding: 50px;
+            box-shadow: var(--shadow-lg);
+            margin-bottom: 50px;
+            border: 2px solid var(--border-color);
+            backdrop-filter: blur(10px);
+            animation: slideUp 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(40px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .input-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 24px;
+        }
+
+        @media (max-width: 600px) {
+            .input-row, .input-section {
+                padding: 24px;
+            }
+            .input-row {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .input-group {
+            position: relative;
+            animation: slideUp 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        .input-group:nth-child(2) {
+            animation-delay: 0.1s;
+        }
+
+        .input-group:nth-child(3) {
+            animation-delay: 0.2s;
+        }
+
+        .input-group label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: var(--text-primary);
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+        }
+
+        .input-group input,
+        .input-group textarea {
+            width: 100%;
+            padding: 14px 16px;
+            border: 2px solid var(--border-color);
+            border-radius: var(--radius-md);
+            font-family: 'Inter', sans-serif;
+            font-size: 14px;
+            transition: all var(--transition-base);
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+        }
+
+        .input-group input::placeholder,
+        .input-group textarea::placeholder {
+            color: var(--text-tertiary);
+        }
+
+        .input-group input:focus,
+        .input-group textarea:focus {
+            outline: none;
+            border-color: var(--color-primary);
+            box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+            background: var(--card-bg);
+        }
+
+        .input-group textarea {
+            resize: vertical;
+            min-height: 140px;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .char-count {
+            font-size: 12px;
+            color: var(--text-tertiary);
+            margin-top: 6px;
+            text-align: right;
+        }
+
+        /* BUTTON */
+        .btn-primary {
+            width: 100%;
+            padding: 16px;
+            border: none;
+            border-radius: var(--radius-md);
+            background: linear-gradient(135deg, var(--color-primary), var(--color-secondary));
+            color: #fff;
+            font-size: 15px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all var(--transition-base);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-family: 'Poppins', sans-serif;
+            box-shadow: var(--shadow-md);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-primary::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+            transition: transform var(--transition-base);
+            transform: translateX(-100%);
+        }
+
+        .btn-primary:hover::before {
+            transform: translateX(100%);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .btn-primary:active {
+            transform: translateY(0);
+        }
+
+        .btn-primary.loading {
+            opacity: 0.7;
+            cursor: not-allowed;
+        }
+
+        /* SPINNER */
+        .spinner {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: spin 1s linear infinite;
+            margin-right: 8px;
+            vertical-align: middle;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* RESULT SECTION */
+        .result-section {
+            background: var(--card-bg);
+            border-radius: var(--radius-xl);
+            padding: 50px;
+            box-shadow: var(--shadow-lg);
+            margin-bottom: 50px;
+            border: 2px solid var(--border-color);
+            backdrop-filter: blur(10px);
+            display: none;
+            animation: slideUp 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        .result-section.show {
+            display: block;
+        }
+
+        .result-section @media (max-width: 600px) {
+            padding: 24px;
+        }
+
+        .sentiment-result {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .sentiment-emoji {
+            font-size: 100px;
+            margin-bottom: 24px;
+            animation: bounce 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+            display: inline-block;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-30px); }
+        }
+
+        .sentiment-label {
+            font-size: 48px;
+            font-weight: 900;
+            background: linear-gradient(135deg, var(--color-primary), var(--color-secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 16px;
+            font-family: 'Montserrat', sans-serif;
+        }
+
+        .sentiment-score {
+            font-size: 18px;
+            color: var(--text-secondary);
+            margin-bottom: 24px;
+            font-weight: 500;
+        }
+
+        .confidence-bar-container {
+            margin-bottom: 30px;
+        }
+
+        .confidence-bar {
+            width: 100%;
+            height: 10px;
+            background: var(--bg-tertiary);
+            border-radius: 10px;
+            overflow: hidden;
+            margin-bottom: 8px;
+        }
+
+        .confidence-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--color-primary), var(--color-secondary));
+            border-radius: 10px;
+            animation: fillProgress 1s ease;
+        }
+
+        @keyframes fillProgress {
+            from { width: 0; }
+        }
+
+        .confidence-text {
+            font-size: 12px;
+            color: var(--text-tertiary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-weight: 600;
+        }
+
+        .result-details {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+            margin-top: 36px;
+        }
+
+        @media (max-width: 600px) {
+            .result-details {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .detail-card {
+            background: linear-gradient(135deg, var(--bg-secondary) 0%, var(--bg-tertiary) 100%);
+            padding: 24px;
+            border-radius: var(--radius-lg);
+            text-align: center;
+            transition: all var(--transition-base);
+            border: 2px solid var(--border-color);
+        }
+
+        .detail-card:hover {
+            transform: translateY(-8px);
+            border-color: var(--color-primary);
+            box-shadow: var(--shadow-md);
+        }
+
+        .detail-label {
+            font-size: 12px;
+            color: var(--text-tertiary);
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+
+        .detail-value {
+            font-size: 32px;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--color-primary), var(--color-secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        /* REVIEWS SECTION */
+        .reviews-section {
+            margin-top: 50px;
+        }
+
+        .section-title {
+            font-size: 28px;
+            font-weight: 800;
+            color: var(--text-primary);
+            margin-bottom: 24px;
+            font-family: 'Montserrat', sans-serif;
+        }
+
+        .review-card {
+            background: var(--card-bg);
+            border-radius: var(--radius-lg);
+            padding: 24px;
+            margin-bottom: 20px;
+            box-shadow: var(--shadow-md);
+            border: 2px solid var(--border-color);
+            transition: all var(--transition-base);
+            animation: slideUp 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        .review-card:hover {
+            transform: translateY(-6px);
+            box-shadow: var(--shadow-lg);
+            border-color: var(--color-primary);
+        }
+
+        .review-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 16px;
+            gap: 12px;
+        }
+
+        .review-avatar {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--color-primary), var(--color-secondary));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-weight: 700;
+            font-size: 20px;
+            flex-shrink: 0;
+        }
+
+        .review-info {
+            flex: 1;
+        }
+
+        .review-user {
+            font-weight: 700;
+            color: var(--text-primary);
+            display: block;
+            margin-bottom: 4px;
+        }
+
+        .review-date {
+            font-size: 12px;
+            color: var(--text-tertiary);
+        }
+
+        .review-sentiment {
+            display: inline-block;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .sentiment-positive {
+            background: rgba(34, 197, 94, 0.15);
+            color: var(--color-positive);
+        }
+
+        .sentiment-negative {
+            background: rgba(239, 68, 68, 0.15);
+            color: var(--color-negative);
+        }
+
+        .sentiment-neutral {
+            background: rgba(168, 85, 247, 0.15);
+            color: var(--color-neutral);
+        }
+
+        .review-text {
+            color: var(--text-primary);
+            line-height: 1.7;
+            margin-bottom: 16px;
+            font-size: 14px;
+        }
+
+        .review-footer {
+            display: flex;
+            gap: 24px;
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        .review-stat {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            cursor: pointer;
+            transition: color var(--transition-fast);
+        }
+
+        .review-stat:hover {
+            color: var(--color-primary);
+        }
+
+        /* FOOTER */
+        footer {
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.1), rgba(118, 75, 162, 0.1));
+            border-top: 2px solid var(--border-color);
+            padding: 40px 20px;
+            text-align: center;
+            color: var(--text-secondary);
+            margin-top: 80px;
+        }
+
+        footer p {
+            margin-bottom: 10px;
+        }
+
+        /* UTILITIES */
+        .hidden {
+            display: none !important;
+        }
+
+        .text-center {
+            text-align: center;
+        }
+
+        @media (max-width: 768px) {
+            header {
+                padding: 60px 20px 40px;
+            }
+
+            .logo {
+                font-size: 40px;
+            }
+
+            .tagline {
+                font-size: 18px;
+            }
+
+            .input-section, .result-section {
+                padding: 24px;
+            }
+
+            .sentiment-emoji {
+                font-size: 70px;
+            }
+
+            .sentiment-label {
+                font-size: 36px;
+            }
+
+            .section-title {
+                font-size: 22px;
+            }
+        }
+    </style>
+</head>
+<body class="light-mode">
+    <!-- NAVBAR -->
+    <nav id="navbar">
+        <div class="nav-container">
+            <div class="nav-brand">✨ SentimentPulse</div>
+            <ul class="nav-links">
+                <li><a href="#home">Home</a></li>
+                <li><a href="#features">Features</a></li>
+                <li><a href="#demo">Demo</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- THEME TOGGLE -->
+    <button class="theme-toggle" id="themeToggle">
+        <span id="themeIcon">🌙</span>
+        <span id="themeText">Dark</span>
+    </button>
+
+    <!-- HEADER -->
+    <header id="home">
+        <h1 class="logo">✨ SentimentPulse Pro</h1>
+        <p class="tagline">
+            <span class="typing-animation">Advanced AI Sentiment Analysis</span>
+        </p>
+        
+        <div class="sentiment-rotator">
+            <div class="rotating-text" id="rotatingText">Positive</div>
+        </div>
+    </header>
+
+    <!-- MAIN CONTENT -->
+    <div class="container">
+        <!-- INPUT SECTION -->
+        <div class="input-section" id="demo">
+            <div class="input-row">
+                <div class="input-group">
+                    <label for="urlInput">📎 Product URL</label>
+                    <input 
+                        type="url" 
+                        id="urlInput" 
+                        placeholder="amazon.com/dp/..."
+                        maxlength="500"
+                    >
+                </div>
+                <div class="input-group">
+                    <label for="reviewInput">💬 Quick Review</label>
+                    <input 
+                        type="text" 
+                        id="reviewInput" 
+                        placeholder="Enter a short product review..."
+                        maxlength="200"
+                    >
+                </div>
+            </div>
+
+            <div class="input-group">
+                <label for="textareaInput">📝 Full Review Text</label>
+                <textarea 
+                    id="textareaInput" 
+                    placeholder="Paste detailed product review here..."
+                    maxlength="5000"
+                ></textarea>
+                <div class="char-count">
+                    <span id="charCount">0</span> / 5000 characters
+                </div>
+            </div>
+
+            <button class="btn-primary" id="analyzeBtn">🚀 Analyze Sentiment</button>
+        </div>
+
+        <!-- RESULT SECTION -->
+        <div class="result-section" id="resultSection">
+            <div class="sentiment-result">
+                <div class="sentiment-emoji" id="sentimentEmoji">😊</div>
+                <div class="sentiment-label" id="sentimentLabel">Positive</div>
+                <div class="sentiment-score" id="sentimentScore">Confidence: 85%</div>
+                
+                <div class="confidence-bar-container">
+                    <div class="confidence-bar">
+                        <div class="confidence-fill" id="confidenceFill" style="width: 85%;"></div>
+                    </div>
+                    <div class="confidence-text" id="confidenceText">85% Confident</div>
+                </div>
+
+                <div class="result-details">
+                    <div class="detail-card">
+                        <div class="detail-label">Positive Score</div>
+                        <div class="detail-value" id="positiveScore">45%</div>
+                    </div>
+                    <div class="detail-card">
+                        <div class="detail-label">Neutral Score</div>
+                        <div class="detail-value" id="neutralScore">30%</div>
+                    </div>
+                    <div class="detail-card">
+                        <div class="detail-label">Negative Score</div>
+                        <div class="detail-value" id="negativeScore">25%</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- REVIEWS SECTION -->
+            <div class="reviews-section">
+                <div style="display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:18px; flex-wrap:wrap;">
+                    <h2 class="section-title">📊 Related Reviews</h2>
+                    <button class="btn-secondary" id="downloadPdfBtn" type="button" style="min-width:180px;">Download PDF</button>
+                </div>
+                
+                <div class="review-card">
+                    <div class="review-header">
+                        <div class="review-avatar">👤</div>
+                        <div class="review-info">
+                            <span class="review-user">Jessica Miller</span>
+                            <span class="review-date">Yesterday at 2:43 PM</span>
+                        </div>
+                        <span class="review-sentiment sentiment-positive">Positive</span>
+                    </div>
+                    <div class="review-text">
+                        "Outstanding product! Everything about it screams quality. The packaging was excellent, delivery was super fast, and it works perfectly. Would definitely buy again!"
+                    </div>
+                    <div class="review-footer">
+                        <span class="review-stat">👍 456</span>
+                        <span class="review-stat">💬 78</span>
+                        <span class="review-stat">🔗 23</span>
+                    </div>
+                </div>
+
+                <div class="review-card">
+                    <div class="review-header">
+                        <div class="review-avatar">🧑</div>
+                        <div class="review-info">
+                            <span class="review-user">Alex Chen</span>
+                            <span class="review-date">3 days ago</span>
+                        </div>
+                        <span class="review-sentiment sentiment-neutral">Neutral</span>
+                    </div>
+                    <div class="review-text">
+                        "It's okay. Nothing special but does the job. Average quality for the price point. Could be better, but could also be worse. Meets expectations halfway."
+                    </div>
+                    <div class="review-footer">
+                        <span class="review-stat">👍 167</span>
+                        <span class="review-stat">💬 34</span>
+                        <span class="review-stat">🔗 12</span>
+                    </div>
+                </div>
+
+                <div class="review-card">
+                    <div class="review-header">
+                        <div class="review-avatar">👨</div>
+                        <div class="review-info">
+                            <span class="review-user">David Thompson</span>
+                            <span class="review-date">1 week ago</span>
+                        </div>
+                        <span class="review-sentiment sentiment-negative">Negative</span>
+                    </div>
+                    <div class="review-text">
+                        "Very disappointed! Product arrived damaged and customer service was unhelpful. Waste of money. Do not recommend. Definitely look for alternatives."
+                    </div>
+                    <div class="review-footer">
+                        <span class="review-stat">👍 45</span>
+                        <span class="review-stat">💬 89</span>
+                        <span class="review-stat">🔗 156</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.3/html2pdf.bundle.min.js" integrity="sha512-YcsIPsc2UUCnRte6GcQ64ohgK7k1vJ3FXvVbAED4ffYbcB5/BMN7bJLxv1H0Xx5EkYzuS5Cib7cH5pX6B/z7ug==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+    <!-- FOOTER -->
+    <footer>
+        <p>© 2024 SentimentPulse Pro - AI-Powered Sentiment Analysis</p>
+        <p>Built with ❤️ using pure HTML, CSS & JavaScript</p>
+    </footer>
+
+    <script>
+        // ========= THEME TOGGLE =========
+        const themeToggle = document.getElementById('themeToggle');
+        const body = document.body;
+        const themeIcon = document.getElementById('themeIcon');
+        const themeText = document.getElementById('themeText');
+        const navbar = document.getElementById('navbar');
+
+        const savedTheme = localStorage.getItem('theme') || 'light-mode';
+        body.className = savedTheme;
+        updateThemeButton();
+
+        themeToggle.addEventListener('click', () => {
+            if (body.classList.contains('light-mode')) {
+                body.classList.remove('light-mode');
+                body.classList.add('dark-mode');
+                navbar.classList.add('dark-mode');
+                localStorage.setItem('theme', 'dark-mode');
+            } else {
+                body.classList.remove('dark-mode');
+                body.classList.add('light-mode');
+                navbar.classList.remove('dark-mode');
+                localStorage.setItem('theme', 'light-mode');
+            }
+            updateThemeButton();
+        });
+
+        function updateThemeButton() {
+            if (body.classList.contains('dark-mode')) {
+                themeIcon.textContent = '☀️';
+                themeText.textContent = 'Light';
+            } else {
+                themeIcon.textContent = '🌙';
+                themeText.textContent = 'Dark';
+            }
+        }
+
+        // ========= ROTATING SENTIMENT =========
+        const sentiments = ['Positive', 'Neutral', 'Negative', 'Insightful!'];
+        let sentimentIndex = 0;
+        const rotatingText = document.getElementById('rotatingText');
+
+        setInterval(() => {
+            sentimentIndex = (sentimentIndex + 1) % sentiments.length;
+            rotatingText.textContent = sentiments[sentimentIndex];
+        }, 1800);
+
+        // ========= CHARACTER COUNTER =========
+        const textareaInput = document.getElementById('textareaInput');
+        const charCount = document.getElementById('charCount');
+
+        textareaInput.addEventListener('input', () => {
+            charCount.textContent = textareaInput.value.length;
+        });
+
+        // ========= ANALYZE BUTTON =========
+        const analyzeBtn = document.getElementById('analyzeBtn');
+        const resultSection = document.getElementById('resultSection');
+        const urlInput = document.getElementById('urlInput');
+        const reviewInput = document.getElementById('reviewInput');
+
+        analyzeBtn.addEventListener('click', () => {
+            const hasInput = urlInput.value || reviewInput.value || textareaInput.value;
+
+            if (!hasInput) {
+                alert('🔔 Please enter a URL or review text to analyze!');
+                return;
+            }
+
+            analyzeBtn.classList.add('loading');
+            analyzeBtn.innerHTML = '<span class="spinner"></span>Analyzing...';
+            analyzeBtn.disabled = true;
+
+            setTimeout(() => {
+                const scores = generateRandomScores();
+                displayResults(scores);
+
+                analyzeBtn.classList.remove('loading');
+                analyzeBtn.innerHTML = '🚀 Analyze Sentiment';
+                analyzeBtn.disabled = false;
+
+                resultSection.classList.add('show');
+                resultSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                if (downloadPdfBtn) {
+                    downloadProductReport();
+                }
+            }, 2000);
+        });
+
+        function downloadProductReport() {
+            const element = resultSection;
+            if (!element || typeof html2pdf !== 'function') {
+                return;
+            }
+            const opt = {
+                margin: 0.35,
+                filename: 'product_analysis_result.pdf',
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { scale: 2, useCORS: true },
+                jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' }
+            };
+            html2pdf().set(opt).from(element).save();
+        }
+
+        if (downloadPdfBtn) {
+            downloadPdfBtn.addEventListener('click', downloadProductReport);
+        }
+
+        function generateRandomScores() {
+            const positive = Math.floor(Math.random() * 100);
+            const negative = Math.floor(Math.random() * (100 - positive));
+            const neutral = 100 - positive - negative;
+
+            return {
+                positive,
+                neutral,
+                negative,
+                dominant: getDominantSentiment(positive, neutral, negative)
+            };
+        }
+
+        function getDominantSentiment(positive, neutral, negative) {
+            const scores = {
+                'positive': positive,
+                'neutral': neutral,
+                'negative': negative
+            };
+            return Object.keys(scores).reduce((a, b) => scores[a] > scores[b] ? a : b);
+        }
+
+        function displayResults(scores) {
+            const emojis = { 'positive': '😊', 'neutral': '😐', 'negative': '😞' };
+            const labels = { 'positive': 'Positive', 'neutral': 'Neutral', 'negative': 'Negative' };
+            const dominant = scores.dominant;
+            const confidence = scores[dominant];
+
+            document.getElementById('sentimentEmoji').textContent = emojis[dominant];
+            document.getElementById('sentimentLabel').textContent = labels[dominant];
+            document.getElementById('sentimentScore').textContent = `Confidence: ${confidence}%`;
+            document.getElementById('confidenceFill').style.width = `${confidence}%`;
+            document.getElementById('confidenceText').textContent = `${confidence}% Confident`;
+            document.getElementById('positiveScore').textContent = `${scores.positive}%`;
+            document.getElementById('neutralScore').textContent = `${scores.neutral}%`;
+            document.getElementById('negativeScore').textContent = `${scores.negative}%`;
+        }
+
+        // ========= KEYBOARD SHORTCUTS =========
+        document.addEventListener('keydown', (e) => {
+            if (e.ctrlKey && e.key === 'Enter') {
+                analyzeBtn.click();
+            }
+            if (e.key === 'Escape') {
+                resultSection.classList.remove('show');
+            }
+        });
+
+        // ========= INITIAL LOAD =========
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                const initialScores = {
+                    positive: 72,
+                    neutral: 18,
+                    negative: 10,
+                    dominant: 'positive'
+                };
+                displayResults(initialScores);
+                resultSection.classList.add('show');
+            }, 1000);
+        });
+    </script>
+</body>
+</html>

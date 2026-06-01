@@ -1,0 +1,213 @@
+{% extends "base.html" %}
+
+{% block title %}SentimentPulse - User Dashboard{% endblock %}
+
+{% block extra_styles %}
+    .wrap {
+        max-width: 980px;
+        margin: 48px auto;
+        padding: 52px;
+        border-radius: 24px;
+        background: rgba(255, 255, 255, 0.82);
+        border: 1px solid rgba(109, 161, 221, 0.28);
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+        backdrop-filter: blur(12px);
+        animation: softFloatIn 0.7s ease-out;
+    }
+
+    .title {
+        font-size: 36px;
+        margin-bottom: 10px;
+        background: linear-gradient(135deg, #6ea9ea, #4f86d6, #6ba8ee);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        animation: slideInDown 0.7s ease-out;
+        font-weight: 800;
+    }
+
+    .sub {
+        color: #2c3e50;
+        line-height: 1.8;
+        margin-bottom: 26px;
+        animation: slideInUp 0.7s ease-out 0.1s backwards;
+        font-size: 15px;
+    }
+
+    .grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 18px;
+        margin-top: 24px;
+    }
+
+    .card {
+        background: #ffffff;
+        border: 1px solid rgba(109, 161, 221, 0.24);
+        border-radius: 18px;
+        padding: 28px;
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.04);
+        animation: popIn 0.6s ease-out;
+        transition: all 0.28s ease;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .card:nth-child(1) { animation-delay: 0.2s; }
+    .card:nth-child(2) { animation-delay: 0.3s; }
+    .card:nth-child(3) { animation-delay: 0.4s; }
+    .card:nth-child(4) { animation-delay: 0.5s; }
+
+    .card:before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+        transition: left 0.6s;
+    }
+
+    .card:hover:before {
+        left: 100%;
+    }
+
+    .card:hover {
+        transform: translateY(-4px);
+        border-color: rgba(109, 161, 221, 0.42);
+        box-shadow: 0 16px 36px rgba(79, 142, 219, 0.12);
+    }
+
+    .card h3 {
+        margin-bottom: 10px;
+        font-size: 20px;
+        color: #1a2b3c;
+        font-weight: 800;
+    }
+
+    .card p {
+        color: #44586b;
+        line-height: 1.7;
+        font-size: 14px;
+        margin-bottom: 16px;
+    }
+
+    .btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        padding: 14px 24px;
+        border-radius: 14px;
+        text-decoration: none;
+        font-weight: 800;
+        color: white;
+        background: linear-gradient(135deg, #6eaef8, #4f8edb, #3f78c0);
+        border: 1px solid rgba(106, 174, 255, 0.4);
+        box-shadow: 0 12px 28px rgba(79, 142, 219, 0.34);
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+        position: relative;
+        overflow: hidden;
+        cursor: pointer;
+    }
+
+    .btn:before {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 0;
+        height: 0;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.2);
+        transform: translate(-50%, -50%);
+        transition: width 0.6s, height 0.6s;
+    }
+
+    .btn:hover:before {
+        width: 300px;
+        height: 300px;
+    }
+
+    .btn:hover { 
+        transform: translateY(-2px);
+        box-shadow: 0 16px 36px rgba(99, 102, 241, 0.5);
+    }
+
+    .btn:active {
+        transform: translateY(-1px);
+    }
+
+    .contact-dashboard {
+        margin-top: 30px;
+        padding: 28px;
+        border-radius: 18px;
+        border: 1px solid rgba(109, 161, 221, 0.24);
+        background: #ffffff;
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.04);
+    }
+
+    .contact-dashboard h2 {
+        margin-bottom: 10px;
+        font-size: 22px;
+        color: #1a2b3c;
+    }
+
+    .contact-dashboard p {
+        color: #44586b;
+        margin-bottom: 8px;
+        line-height: 1.65;
+    }
+
+    .contact-dashboard a {
+        color: #3f78b7;
+        font-weight: 700;
+        text-decoration: none;
+    }
+
+    .contact-dashboard a:hover {
+        color: #2f669f;
+    }
+{% endblock %}
+
+{% block content %}
+<div class="wrap">
+    <div class="title">
+        Welcome, {{ first_name or (session.get('email') or '').split('@')[0] }}
+    </div>
+    <div class="sub">
+        You’re signed in as <b>User</b>. Start by analyzing a product page — we’ll scrape reviews in real time and summarize customer sentiment.
+    </div>
+
+    <div class="grid">
+        <div class="card">
+            <h3>Analyze Product Reviews</h3>
+            <p>Paste a product URL (from a store that publishes JSON-LD reviews) and get instant sentiment percentages + a sample of classified reviews.</p>
+            <a class="btn" href="{{ url_for('sklearn_analytics') }}">Analyze now</a>
+        </div>
+        <div class="card">
+            <h3>Text Emotion Analyzer (optional)</h3>
+            <p>This is your earlier prototype feature: analyze a text snippet using the GO-Emotions model.</p>
+            <a class="btn" href="/legacy/text">Open tool</a>
+        </div>
+        <div class="card">
+            <h3>📊 Analytics Dashboard</h3>
+            <p>View your sentiment analysis trends, emotion distribution, and performance metrics with interactive charts.</p>
+            <a class="btn" href="/dashboard/analytics">View Analytics</a>
+        </div>
+        <div class="card">
+            <h3>🛍️ Solebazaar India</h3>
+            <p>Visit our internal shopping website to verify real-time sentiment analysis on a standardized set of reviews.</p>
+            <a class="btn" href="https://shopsense-ai.netlify.app/" target="_blank">Visit Platform</a>
+        </div>
+    </div>
+
+    <section class="contact-dashboard">
+        <h2>Contact Us</h2>
+        <p>Need help or want to share feedback? Reach out from the contact page.</p>
+        <p><a href="{{ url_for('contact') }}">Go to Contact Us →</a></p>
+    </section>
+</div>
+{% endblock %}
+
+

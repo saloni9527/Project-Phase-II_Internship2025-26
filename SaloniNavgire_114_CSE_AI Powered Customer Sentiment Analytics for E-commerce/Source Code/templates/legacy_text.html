@@ -1,0 +1,166 @@
+{% extends "base.html" %}
+
+{% block title %}SentimentPulse - Text Emotion Analyzer{% endblock %}
+
+{% block extra_styles %}
+    .analyze-container {
+        background: #FFFFFF;
+        border-radius: 28px;
+        padding: 70px 60px;
+        max-width: 800px;
+        margin: 60px auto;
+        border: 1px solid #E1E8F0;
+        box-shadow: 0 18px 40px rgba(26, 43, 60, 0.08);
+        animation: fadeInUp 0.8s ease-out;
+        transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+    }
+
+    .analyze-container:hover {
+        transform: translateY(-4px);
+        border-color: #D8E3EC;
+        box-shadow: 0 24px 48px rgba(26, 43, 60, 0.12);
+    }
+
+    h1 {
+        text-align: center;
+        margin-bottom: 16px;
+        font-size: 40px;
+        color: #1A2B3C;
+        animation: slideInDown 0.7s ease-out;
+        font-weight: 800;
+    }
+
+    .sub {
+        text-align: center;
+        color: #718096;
+        margin-bottom: 32px;
+        line-height: 1.8;
+        animation: slideInUp 0.7s ease-out 0.1s backwards;
+        font-size: 15px;
+    }
+
+    .form-group {
+        margin-bottom: 24px;
+        animation: slideInUp 0.8s ease-out 0.2s backwards;
+    }
+
+    textarea {
+        width: 100%;
+        min-height: 240px;
+        padding: 20px;
+        border-radius: 18px;
+        border: 2px solid #E1E8F0;
+        background: #F8FAFC;
+        color: #1A2B3C;
+        font-size: 16px;
+        font-family: inherit;
+        resize: vertical;
+        outline: none;
+        transition: border-color 0.22s ease, box-shadow 0.22s ease, background 0.22s ease;
+        box-shadow: inset 0 1px 2px rgba(26, 43, 60, 0.04);
+    }
+
+    textarea:focus {
+        border-color: #5A91E8;
+        background: #FFFFFF;
+        box-shadow: 0 0 0 4px rgba(90, 145, 232, 0.14), inset 0 1px 2px rgba(26, 43, 60, 0.08);
+        transform: translateY(-2px);
+    }
+
+    textarea::placeholder {
+        color: #718096;
+        font-style: italic;
+    }
+
+    button {
+        width: 100%;
+        padding: 16px;
+        border: none;
+        border-radius: 16px;
+        background: #5A91E8;
+        color: #ffffff;
+        font-size: 16px;
+        font-weight: 800;
+        cursor: pointer;
+        transition: transform 0.25s ease, box-shadow 0.25s ease, background 0.25s ease;
+        box-shadow: 0 12px 28px rgba(90, 145, 232, 0.24);
+        position: relative;
+        overflow: hidden;
+        animation: slideInUp 0.8s ease-out 0.3s backwards;
+    }
+
+    button:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 18px 36px rgba(90, 145, 232, 0.3);
+        background: #4F82D4;
+    }
+
+    button:active {
+        transform: translateY(-1px);
+    }
+{% endblock %}
+
+{% block content %}
+<div class="analyze-container">
+    <h1>Text Emotion Analyzer</h1>
+    <div class="sub">Legacy prototype tool (GO-Emotions). Use this to analyze a free-form message.</div>
+
+    <form action="/analyze" method="POST" id="text-form" onsubmit="return validateText()">
+        <div class="form-group">
+            <textarea id="userText" name="text" placeholder="Enter your text here for emotion analysis..."></textarea>
+        </div>
+        <button type="submit" id="analyze-text-btn">Analyze Text</button>
+    </form>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+function validateText() {
+    let text = document.getElementById("userText").value.trim();
+    let words = text.split(/\s+/).filter(w => w.length > 0);
+
+    if (text.length === 0) { alert("⚠️ Please enter some text. Empty field is not allowed."); return false; }
+    if (text.length < 10) { alert("⚠️ Text is too short. Please enter at least 10 characters."); return false; }
+    if (words.length < 3) { alert("⚠️ Please enter at least 3 words for meaningful analysis."); return false; }
+    if (/^[\d\s]+$/.test(text)) { alert("⚠️ Input cannot contain only numbers."); return false; }
+
+    let textNoSpaces = text.replace(/\s+/g, '');
+    if (textNoSpaces.length > 0 && !/[a-zA-Z0-9]/.test(textNoSpaces)) {
+        alert("⚠️ Input cannot contain only special characters."); return false;
+    }
+
+    if (!/[a-zA-Z]/.test(text)) { alert("⚠️ Please enter text containing English letters."); return false; }
+
+    let specialCharCount = (text.match(/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/g) || []).length;
+    if (text.length > 0 && (specialCharCount / text.length) > 0.3) {
+        alert("⚠️ Too many special characters. Please enter meaningful text."); return false;
+    }
+
+    let alphaText = text.replace(/[^a-zA-Z]/g, '').toLowerCase();
+    if (alphaText.length > 0) {
+        let vowels = (alphaText.match(/[aeiou]/g) || []).length;
+        let vowelRatio = vowels / alphaText.length;
+        if (vowelRatio < 0.15) { alert("⚠️ Text appears to be gibberish. Please enter meaningful English text."); return false; }
+    }
+
+    if (/(.)\1{3,}/.test(text)) { alert("⚠️ Text contains excessive repeated characters. Please enter meaningful text."); return false; }
+
+    let digitCount = (text.match(/\d/g) || []).length;
+    if (text.length > 0 && (digitCount / text.length) > 0.5) {
+        alert("⚠️ Text contains too many numbers. Please enter meaningful text."); return false;
+    }
+
+    // If validation passes, disable the button
+    const button = document.getElementById('analyze-text-btn');
+    button.disabled = true;
+    button.textContent = 'Analyzing...';
+    button.style.opacity = '0.6';
+    button.style.cursor = 'not-allowed';
+
+    return true;
+}
+</script>
+{% endblock %}
+
+

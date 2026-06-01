@@ -1,0 +1,167 @@
+{% extends "base.html" %}
+
+{% block title %}SentimentPulse - Rating breakdown{% endblock %}
+
+{% block extra_styles %}
+    .ml-panel {
+        max-width: 640px;
+        margin: 55px auto;
+        padding: 48px;
+        border-radius: 24px;
+        background: linear-gradient(135deg, rgba(139, 92, 246, 0.12), rgba(99, 102, 241, 0.08));
+        border: 1px solid rgba(148, 163, 184, 0.15);
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+        animation: fadeInScale 0.8s ease-out;
+        backdrop-filter: blur(12px);
+    }
+
+    .ml-panel h1 {
+        font-size: 30px;
+        margin-bottom: 12px;
+        background: linear-gradient(135deg, #c4b5fd, #a5b4fc, #60a5fa);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        font-weight: 800;
+    }
+
+    .ml-panel .back {
+        display: inline-block;
+        margin-bottom: 22px;
+        color: #a5b4fc;
+        text-decoration: none;
+        font-weight: 600;
+        font-size: 14px;
+    }
+
+    .ml-panel .back:hover { color: #c4b5fd; }
+
+    .ml-summary {
+        text-align: left;
+        color: rgba(255, 255, 255, 0.88);
+        line-height: 1.85;
+        font-size: 15px;
+        margin-bottom: 24px;
+    }
+
+    .ml-summary strong {
+        color: #e2e8f0;
+    }
+
+    .ml-dist-title {
+        font-size: 13px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        color: rgba(255, 255, 255, 0.75);
+        margin-bottom: 14px;
+    }
+
+    .ml-dist-row {
+        display: grid;
+        grid-template-columns: 72px 1fr 48px;
+        gap: 12px;
+        align-items: center;
+        margin-bottom: 12px;
+        font-size: 13px;
+        color: rgba(255, 255, 255, 0.85);
+    }
+
+    .ml-bar {
+        height: 12px;
+        border-radius: 999px;
+        background: rgba(255, 255, 255, 0.08);
+        overflow: hidden;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .ml-bar > span {
+        display: block;
+        height: 100%;
+        width: 0%;
+        background: linear-gradient(135deg, rgba(139, 92, 246, 0.95), rgba(99, 102, 241, 0.95));
+        border-radius: 999px;
+        transition: width 0.6s ease;
+    }
+
+    .ml-muted {
+        font-size: 12px;
+        color: rgba(255, 255, 255, 0.55);
+    }
+
+    /* Light Classic ML look to match analyzer page */
+    .ml-panel {
+        background: rgba(255, 255, 255, 0.82);
+        border: 1px solid rgba(109, 161, 221, 0.28);
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+        animation: softFloatIn 0.7s ease-out;
+    }
+
+    .ml-panel h1 {
+        background: linear-gradient(135deg, #6ea9ea, #4f86d6, #6ba8ee);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+
+    .ml-panel .back {
+        color: #3f78b7;
+    }
+
+    .ml-panel .back:hover {
+        color: #2f669f;
+    }
+
+    .ml-summary {
+        color: #2c3e50;
+    }
+
+    .ml-summary strong {
+        color: #1a2b3c;
+    }
+
+    .ml-dist-title,
+    .ml-dist-row {
+        color: #2c3e50;
+    }
+
+    .ml-bar {
+        background: rgba(106, 174, 255, 0.08);
+        border: 1px solid rgba(109, 161, 221, 0.24);
+    }
+
+    .ml-bar > span {
+        background: linear-gradient(135deg, #6eaef8, #4f8edb, #3f78c0);
+    }
+
+    .ml-muted {
+        color: #5a6f82;
+    }
+{% endblock %}
+
+{% block content %}
+<div class="ml-panel">
+    <h1>Rating breakdown</h1>
+    <a class="back" href="/sklearn-analytics">← Back to classic analyzer</a>
+
+    <div class="ml-summary">
+        <strong>Total reviews analyzed:</strong> {{ total_reviews }}<br>
+        <strong>Average star rating:</strong> {{ avg_star_rating }} / 5<br>
+        <strong>Sentiment breakdown:</strong><br>
+        &nbsp;&nbsp;• Positive: {{ positive }}%<br>
+        &nbsp;&nbsp;• Neutral: {{ neutral }}%<br>
+        &nbsp;&nbsp;• Negative: {{ negative }}%
+    </div>
+
+    <div class="ml-dist-title">Star distribution (scraped)</div>
+    {% set star_total = star_1 + star_2 + star_3 + star_4 + star_5 %}
+    {% for s, count in [(5, star_5), (4, star_4), (3, star_3), (2, star_2), (1, star_1)] %}
+        {% set bar_percent = (count * 100.0 / star_total) if star_total > 0 else 0 %}
+        <div class="ml-dist-row">
+            <div>{{ s }} ★</div>
+            <div class="ml-bar"><span style="width: {{ bar_percent }}%;"></span></div>
+            <div class="ml-muted">{{ count }}<br><span style="font-size:11px;">{{ '%.1f'|format(bar_percent) }}%</span></div>
+        </div>
+    {% endfor %}
+</div>
+{% endblock %}

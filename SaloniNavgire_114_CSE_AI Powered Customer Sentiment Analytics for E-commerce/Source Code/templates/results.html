@@ -1,0 +1,487 @@
+{% extends "base.html" %}
+
+{% block title %}Text Analysis - History{% endblock %}
+
+{% block extra_styles %}
+    .results-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 30px;
+        flex-wrap: wrap;
+        gap: 20px;
+    }
+    
+    .search-container {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        flex: 1;
+        min-width: 300px;
+    }
+    
+    .search-box {
+        flex: 1;
+        padding: 12px 20px;
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        border-radius: 8px;
+        color: #ffffff;
+        font-size: 14px;
+        outline: none;
+        transition: all 0.3s;
+    }
+    
+    .search-box:focus {
+        border-color: #8b5cf6;
+        background: rgba(255, 255, 255, 0.08);
+    }
+    
+    .search-box::placeholder {
+        color: rgba(255, 255, 255, 0.4);
+    }
+    
+    .export-controls {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+    
+    .sort-select {
+        padding: 10px 15px;
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        border-radius: 8px;
+        color: #ffffff;
+        font-size: 14px;
+        outline: none;
+        cursor: pointer;
+    }
+    
+    .export-btn {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 10px 20px;
+        border: none;
+        border-radius: 8px;
+        font-size: 14px;
+        cursor: pointer;
+        transition: all 0.3s;
+        text-decoration: none;
+    }
+    
+    .export-btn.json {
+        background: linear-gradient(135deg, #8b5cf6, #6366f1);
+        color: white;
+    }
+    
+    .export-btn.csv {
+        background: linear-gradient(135deg, #06b6d4, #3b82f6);
+        color: white;
+    }
+    
+    .export-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    }
+    
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 20px;
+        margin-bottom: 40px;
+    }
+    
+    .stat-card {
+        background: rgba(15, 23, 42, 0.6);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 12px;
+        padding: 30px;
+        text-align: center;
+    }
+    
+    .stat-value {
+        font-size: 36px;
+        font-weight: bold;
+        background: linear-gradient(135deg, #8b5cf6, #6366f1);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        margin-bottom: 10px;
+    }
+    
+    .stat-label {
+        font-size: 14px;
+        color: rgba(255, 255, 255, 0.6);
+        margin-bottom: 5px;
+    }
+    
+    .stat-sublabel {
+        font-size: 12px;
+        color: rgba(255, 255, 255, 0.4);
+    }
+    
+    .table-container {
+        background: rgba(15, 23, 42, 0.6);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 12px;
+        overflow: hidden;
+    }
+    
+    table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+    
+    thead {
+        background: rgba(255, 255, 255, 0.05);
+    }
+    
+    th {
+        padding: 20px;
+        text-align: left;
+        font-size: 12px;
+        font-weight: 600;
+        color: rgba(255, 255, 255, 0.6);
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+    
+    td {
+        padding: 20px;
+        border-top: 1px solid rgba(255, 255, 255, 0.05);
+        color: #ffffff;
+    }
+    
+    tr:hover {
+        background: rgba(255, 255, 255, 0.03);
+    }
+    
+    .emotion-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 6px 12px;
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 6px;
+        font-size: 14px;
+    }
+    
+    .emotion-emoji {
+        font-size: 18px;
+    }
+    
+    .confidence-bar {
+        width: 100%;
+        height: 8px;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 4px;
+        overflow: hidden;
+        margin-bottom: 5px;
+    }
+    
+    .confidence-fill {
+        height: 100%;
+        background: linear-gradient(90deg, #8b5cf6, #6366f1);
+        transition: width 0.3s;
+    }
+    
+    .confidence-text {
+        font-size: 12px;
+        color: rgba(255, 255, 255, 0.6);
+    }
+    
+    .action-buttons {
+        display: flex;
+        gap: 10px;
+    }
+    
+    .action-btn {
+        padding: 8px 16px;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 12px;
+        transition: all 0.3s;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+    
+    .action-btn.view {
+        background: rgba(139, 92, 246, 0.2);
+        color: #a78bfa;
+        border: 1px solid rgba(139, 92, 246, 0.3);
+    }
+    
+    .action-btn.view:hover {
+        background: rgba(139, 92, 246, 0.3);
+    }
+    
+    .action-btn.delete {
+        background: rgba(239, 68, 68, 0.2);
+        color: #f87171;
+        border: 1px solid rgba(239, 68, 68, 0.3);
+    }
+    
+    .action-btn.delete:hover {
+        background: rgba(239, 68, 68, 0.3);
+    }
+    
+    .modal {
+        display: none;
+        position: fixed;
+        z-index: 1000;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.8);
+        backdrop-filter: blur(5px);
+    }
+    
+    .modal-content {
+        background: #0a0e27;
+        margin: 10% auto;
+        padding: 40px;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 12px;
+        width: 90%;
+        max-width: 600px;
+        max-height: 80vh;
+        overflow-y: auto;
+    }
+    
+    .modal-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+    }
+    
+    .modal-title {
+        font-size: 24px;
+        font-weight: bold;
+    }
+    
+    .close {
+        color: rgba(255, 255, 255, 0.6);
+        font-size: 28px;
+        font-weight: bold;
+        cursor: pointer;
+        transition: color 0.3s;
+    }
+    
+    .close:hover {
+        color: #ffffff;
+    }
+    
+    .modal-text {
+        background: rgba(255, 255, 255, 0.05);
+        padding: 20px;
+        border-radius: 8px;
+        line-height: 1.6;
+        white-space: pre-wrap;
+        word-wrap: break-word;
+    }
+{% endblock %}
+
+{% block content %}
+<div class="results-header">
+    <div class="search-container">
+        <input type="text" class="search-box" id="searchInput" placeholder="🔍 Search Texts...">
+    </div>
+    <div class="export-controls">
+        <select class="sort-select" id="sortSelect">
+            <option value="newest">Newest First</option>
+            <option value="oldest">Oldest First</option>
+            <option value="confidence-high">Confidence: High to Low</option>
+            <option value="confidence-low">Confidence: Low to High</option>
+        </select>
+        <a href="/export/json" class="export-btn json">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                <polyline points="14 2 14 8 20 8"/>
+            </svg>
+            JSON
+        </a>
+        <a href="/export/csv" class="export-btn csv">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                <polyline points="14 2 14 8 20 8"/>
+            </svg>
+            CSV
+        </a>
+    </div>
+</div>
+
+<div class="stats-grid">
+    <div class="stat-card">
+        <div class="stat-value">{{ total_recordings }}</div>
+        <div class="stat-label">Total Recordings</div>
+        <div class="stat-sublabel">All time</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-value">{{ avg_confidence }}%</div>
+        <div class="stat-label">Avg Confidence</div>
+        <div class="stat-sublabel">Global average</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-value">{{ total_duration }}w</div>
+        <div class="stat-label">Total Words</div>
+        <div class="stat-sublabel">Analyzed text</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-value">{{ most_common_emotion }}</div>
+        <div class="stat-label">Most Common</div>
+        <div class="stat-sublabel">Dominant emotion</div>
+    </div>
+</div>
+
+<div class="table-container">
+    <table>
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>Date & Time</th>
+                <th>Emotion</th>
+                <th>Confidence</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody id="resultsTable">
+            {% for analysis in analyses %}
+            <tr data-text="{{ analysis[1] }}" data-emotion="{{ analysis[2] }}" data-confidence="{{ analysis[3] }}" data-date="{{ analysis[4] }}">
+                <td>{{ loop.revindex }}</td>
+                <td>{{ analysis[4] }}</td>
+                <td>
+                    <div class="emotion-badge">
+                        <span class="emotion-emoji">{% if analysis[2] == 'joy' %}😊{% elif analysis[2] == 'sadness' %}😢{% elif analysis[2] == 'anger' %}😠{% elif analysis[2] == 'fear' %}😨{% elif analysis[2] == 'surprise' %}😲{% elif analysis[2] == 'neutral' %}😐{% else %}😊{% endif %}</span>
+                        <span>{{ analysis[2].capitalize() }}</span>
+                    </div>
+                </td>
+                <td>
+                    <div class="confidence-bar">
+                        <div class="confidence-fill" style="width: {{ analysis[3] }}%"></div>
+                    </div>
+                    <div class="confidence-text">{{ analysis[3] }}%</div>
+                </td>
+                <td>
+                    <div class="action-buttons">
+                        <button class="action-btn view" onclick="showText({{ analysis[0] }}, '{{ analysis[1]|replace("'", "\\'")|replace('"', '\\"') }}')">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                                <circle cx="12" cy="12" r="3"/>
+                            </svg>
+                            View
+                        </button>
+                        <button class="action-btn delete" onclick="deleteAnalysis({{ analysis[0] }})">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <polyline points="3 6 5 6 21 6"/>
+                                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+                            </svg>
+                            Delete
+                        </button>
+                    </div>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<div id="textModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2 class="modal-title">Text Input</h2>
+            <span class="close" onclick="closeModal()">&times;</span>
+        </div>
+        <div class="modal-text" id="modalText"></div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+function showText(id, text) {
+    document.getElementById('modalText').textContent = text;
+    document.getElementById('textModal').style.display = 'block';
+}
+
+function closeModal() {
+    document.getElementById('textModal').style.display = 'none';
+}
+
+window.onclick = function(event) {
+    const modal = document.getElementById('textModal');
+    if (event.target == modal) {
+        closeModal();
+    }
+}
+
+function deleteAnalysis(id) {
+    if (confirm('Are you sure you want to delete this analysis?')) {
+        fetch(`/delete/${id}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                location.reload();
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Error deleting analysis');
+        });
+    }
+}
+
+// Search functionality
+document.getElementById('searchInput').addEventListener('input', function(e) {
+    const searchTerm = e.target.value.toLowerCase();
+    const rows = document.querySelectorAll('#resultsTable tr');
+    
+    rows.forEach(row => {
+        const text = row.getAttribute('data-text').toLowerCase();
+        const emotion = row.getAttribute('data-emotion').toLowerCase();
+        const date = row.getAttribute('data-date').toLowerCase();
+        
+        if (text.includes(searchTerm) || emotion.includes(searchTerm) || date.includes(searchTerm)) {
+            row.style.display = '';
+        } else {
+            row.style.display = 'none';
+        }
+    });
+});
+
+// Sort functionality
+document.getElementById('sortSelect').addEventListener('change', function(e) {
+    const sortValue = e.target.value;
+    const tbody = document.getElementById('resultsTable');
+    const rows = Array.from(tbody.querySelectorAll('tr'));
+    
+    rows.sort((a, b) => {
+        if (sortValue === 'newest') {
+            return new Date(b.getAttribute('data-date')) - new Date(a.getAttribute('data-date'));
+        } else if (sortValue === 'oldest') {
+            return new Date(a.getAttribute('data-date')) - new Date(b.getAttribute('data-date'));
+        } else if (sortValue === 'confidence-high') {
+            return parseFloat(b.getAttribute('data-confidence')) - parseFloat(a.getAttribute('data-confidence'));
+        } else if (sortValue === 'confidence-low') {
+            return parseFloat(a.getAttribute('data-confidence')) - parseFloat(b.getAttribute('data-confidence'));
+        }
+        return 0;
+    });
+    
+    rows.forEach((row, index) => {
+        row.querySelector('td:first-child').textContent = rows.length - index;
+        tbody.appendChild(row);
+    });
+});
+</script>
+{% endblock %}

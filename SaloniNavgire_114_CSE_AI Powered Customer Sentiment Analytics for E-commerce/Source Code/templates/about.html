@@ -1,0 +1,231 @@
+{% extends "base.html" %}
+
+{% block title %}SentimentPulse - About Us{% endblock %}
+
+{% block extra_styles %}
+    .wrap {
+        max-width: 1180px;
+        margin: 46px auto 30px auto;
+        animation: fadeInUp 0.8s ease-out;
+    }
+
+    .hero {
+        position: relative;
+        border-radius: 28px;
+        border: 1px solid #E1E8F0;
+        background: #FFFFFF;
+        box-shadow: 0 18px 40px rgba(26, 43, 60, 0.08);
+        padding: 64px 60px;
+        overflow: hidden;
+        transition: transform 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .hero:hover {
+        transform: translateY(-4px);
+        border-color: #D8E3EC;
+        box-shadow: 0 24px 52px rgba(26, 43, 60, 0.12);
+    }
+
+    .hero:before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background: radial-gradient(circle at 20% 20%, rgba(90, 145, 232, 0.12), transparent 32%),
+                    radial-gradient(circle at 85% 25%, rgba(90, 145, 232, 0.08), transparent 28%);
+        pointer-events: none;
+        opacity: 0.9;
+    }
+
+    .hero h1 {
+        font-size: 48px;
+        line-height: 1.05;
+        margin-bottom: 14px;
+        color: #1A2B3C;
+        letter-spacing: -0.02em;
+        animation: slideInDown 0.7s ease-out;
+        font-weight: 800;
+        position: relative;
+        z-index: 1;
+    }
+
+    .hero p {
+        color: #718096;
+        font-size: 16px;
+        line-height: 1.8;
+        max-width: 860px;
+        margin-bottom: 18px;
+        animation: slideInUp 0.7s ease-out 0.1s backwards;
+        position: relative;
+        z-index: 1;
+    }
+
+    .grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 18px;
+        margin-top: 22px;
+    }
+
+    .card {
+        background: #FFFFFF;
+        border: 1px solid #E1E8F0;
+        border-radius: 22px;
+        padding: 28px;
+        transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+        animation: popIn 0.6s ease-out;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .card:before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255,255,255,0.15), transparent);
+        transition: left 0.6s;
+        z-index: -1;
+    }
+
+    .card:hover:before {
+        left: 100%;
+    }
+
+    .card:nth-child(1) { animation-delay: 0.2s; }
+    .card:nth-child(2) { animation-delay: 0.3s; }
+    .card:nth-child(3) { animation-delay: 0.4s; }
+
+    .card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 22px 48px rgba(26, 43, 60, 0.12);
+        border-color: #D8E3EC;
+    }
+
+    .card-title {
+        font-weight: 800;
+        margin-bottom: 10px;
+        letter-spacing: -0.01em;
+        font-size: 18px;
+        color: #1A2B3C;
+    }
+
+    .card-desc {
+        color: #718096;
+        line-height: 1.75;
+        font-size: 14px;
+    }
+
+    .cta-row {
+        display: flex;
+        gap: 12px;
+        flex-wrap: wrap;
+        margin-top: 16px;
+        animation: slideInUp 0.8s ease-out 0.2s backwards;
+        position: relative;
+        z-index: 1;
+    }
+
+    .cta {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        padding: 14px 24px;
+        border-radius: 14px;
+        text-decoration: none;
+        font-weight: 700;
+        transition: all 0.3s ease;
+        border: 1px solid #E1E8F0;
+        background: #FFFFFF;
+        color: #1A2B3C;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .cta:before {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 0;
+        height: 0;
+        border-radius: 50%;
+        background: rgba(90, 145, 232, 0.14);
+        transform: translate(-50%, -50%);
+        transition: width 0.6s, height 0.6s;
+    }
+
+    .cta:hover:before {
+        width: 300px;
+        height: 300px;
+    }
+
+    .cta.primary {
+        background: #5A91E8;
+        border-color: transparent;
+        color: #FFFFFF;
+        box-shadow: 0 12px 28px rgba(90, 145, 232, 0.24);
+    }
+
+    .cta:hover {
+        transform: translateY(-2px) scale(1.02);
+    }
+
+    .cta.primary:hover {
+        box-shadow: 0 18px 40px rgba(90, 145, 232, 0.32);
+    }
+
+    .cta:not(.primary):hover {
+        background: rgba(90, 145, 232, 0.08);
+        border-color: #D8E3EC;
+    }
+
+    @media (max-width: 980px) {
+        .grid { grid-template-columns: 1fr; }
+        .hero { padding: 48px 32px; margin: 26px 0 16px 0; }
+        .hero h1 { font-size: 40px; }
+    }
+{% endblock %}
+
+{% block content %}
+<div class="wrap">
+    <div class="hero">
+        <h1>About SentimentPulse</h1>
+        <p>
+            SentimentPulse is built to make customer feedback easier to understand. We turn product reviews into
+            an actionable sentiment overview, so teams can identify what’s working and what needs improvement — fast.
+        </p>
+        <p>
+            You can try the product-link analyzer in guest mode. After your free trials are used,
+            you can create an account and log in to continue using all features without limits.
+        </p>
+
+        <div class="cta-row">
+            <a class="cta" href="/">Back to home</a>
+        </div>
+    </div>
+
+    <div class="grid">
+        <div class="card">
+            <div class="card-title">Mission</div>
+            <div class="card-desc">
+                Empower teams with a clean, fast way to interpret customer reviews and make better product decisions.
+            </div>
+        </div>
+        <div class="card">
+            <div class="card-title">What we do</div>
+            <div class="card-desc">
+                Extract reviews from supported product pages and classify them into Positive / Neutral / Negative with confidence.
+            </div>
+        </div>
+        <div class="card">
+            <div class="card-title">Why it matters</div>
+            <div class="card-desc">
+                Review sentiment highlights common pain points and strengths — helping prioritize fixes, messaging, and product improvements.
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+

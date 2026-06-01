@@ -1,0 +1,125 @@
+{% extends "base.html" %}
+
+{% block title %}SentimentPulse - History{% endblock %}
+
+{% block extra_styles %}
+    .wrap { 
+        max-width: 1100px; 
+        margin: 55px auto;
+        animation: fadeInScale 0.8s ease-out;
+    }
+
+    h1 {
+        font-size: 36px;
+        margin-bottom: 10px;
+        background: linear-gradient(135deg, #c4b5fd, #a5b4fc, #60a5fa);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        animation: slideInDown 0.7s ease-out;
+        font-weight: 800;
+    }
+
+    .sub { 
+        color: rgba(255, 255, 255, 0.8); 
+        line-height: 1.8; 
+        margin-bottom: 22px;
+        animation: slideInUp 0.7s ease-out 0.1s backwards;
+    }
+
+    .box {
+        background: linear-gradient(135deg, rgba(139, 92, 246, 0.12), rgba(99, 102, 241, 0.08));
+        border: 1px solid rgba(148, 163, 184, 0.15);
+        border-radius: 18px;
+        padding: 24px;
+        animation: fadeInScale 0.8s ease-out;
+        backdrop-filter: blur(12px);
+        box-shadow: 0 12px 40px rgba(0, 0, 0, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+        transition: all 0.4s ease;
+    }
+
+    .box:hover {
+        border-color: rgba(139, 92, 246, 0.3);
+        box-shadow: 0 18px 54px rgba(139, 92, 246, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.12);
+    }
+
+    table { 
+        width: 100%; 
+        border-collapse: collapse;
+    }
+
+    th, td { 
+        padding: 16px; 
+        border-top: 1px solid rgba(255, 255, 255, 0.08);
+        transition: all 0.3s ease;
+    }
+
+    th {
+        background: linear-gradient(135deg, rgba(99, 102, 241, 0.15), rgba(59, 130, 246, 0.08));
+        font-size: 12px;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        color: rgba(226, 232, 240, 0.9);
+        text-align: left;
+        font-weight: 700;
+    }
+
+    td { 
+        color: rgba(255, 255, 255, 0.9);
+    }
+
+    tbody tr {
+        transition: all 0.3s ease;
+        animation: slideInUp 0.5s ease-out forwards;
+    }
+
+    tbody tr:hover {
+        background: rgba(139, 92, 246, 0.12);
+        transform: translateX(4px);
+    }
+
+    tbody tr:nth-child(1) { animation-delay: 0.1s; }
+    tbody tr:nth-child(2) { animation-delay: 0.15s; }
+    tbody tr:nth-child(3) { animation-delay: 0.2s; }
+    tbody tr:nth-child(4) { animation-delay: 0.25s; }
+    tbody tr:nth-child(5) { animation-delay: 0.3s; }
+
+    .muted { 
+        color: rgba(255, 255, 255, 0.65); 
+        font-size: 13px;
+        font-weight: 500;
+    }
+{% endblock %}
+
+{% block content %}
+<div class="wrap">
+    <h1>Legacy text analyses</h1>
+    <div class="sub">This page supports your original prototype storage (text → emotion). It’s separate from product-review sentiment runs.</div>
+
+    <div class="box">
+        <div class="muted">Total analyses: {{ total_analyses }} • Avg confidence: {{ avg_confidence }}%</div>
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Emotion</th>
+                    <th>Confidence</th>
+                    <th>Created</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for a in analyses %}
+                <tr>
+                    <td class="muted">{{ a[0] }}</td>
+                    <td>{{ a[2] }}</td>
+                    <td class="muted">{{ a[3] }}%</td>
+                    <td class="muted">{{ a[4] }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
+
+

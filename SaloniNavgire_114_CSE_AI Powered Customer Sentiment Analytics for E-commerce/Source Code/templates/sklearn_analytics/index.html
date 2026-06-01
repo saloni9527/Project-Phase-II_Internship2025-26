@@ -1,0 +1,233 @@
+{% extends "base.html" %}
+
+{% block title %}SentimentPulse - Classic ML{% endblock %}
+
+{% block extra_styles %}
+    .ml-panel {
+        max-width: 900px;
+        margin: 55px auto;
+        padding: 56px;
+        border-radius: 24px;
+        background: rgba(255, 255, 255, 0.82);
+        border: 1px solid rgba(109, 161, 221, 0.28);
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+        animation: softFloatIn 0.7s ease-out;
+        backdrop-filter: blur(12px);
+    }
+
+    .ml-panel h1 {
+        font-size: 36px;
+        margin-bottom: 10px;
+        background: linear-gradient(135deg, #6ea9ea, #4f86d6, #6ba8ee);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        font-weight: 800;
+        animation: slideInDown 0.7s ease-out;
+    }
+
+    .ml-panel .sub {
+        color: #2c3e50;
+        line-height: 1.7;
+        margin-bottom: 18px;
+        font-size: 15px;
+    }
+
+    .ml-panel .back {
+        display: inline-block;
+        margin-bottom: 22px;
+        color: #3f78b7;
+        text-decoration: none;
+        font-weight: 600;
+        font-size: 14px;
+        transition: color 0.2s ease;
+    }
+
+    .ml-panel .back:hover {
+        color: #2f669f;
+    }
+
+    .ml-panel label {
+        display: block;
+        margin-bottom: 10px;
+        margin-top: 18px;
+        color: #2c3e50;
+        font-size: 13px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .ml-panel textarea {
+        width: 100%;
+        min-height: 140px;
+        padding: 16px 18px;
+        border-radius: 14px;
+        border: 1px solid #b8d8ff;
+        background: #ffffff;
+        color: #2c3e50;
+        font-size: 15px;
+        font-family: inherit;
+        outline: none;
+        resize: vertical;
+        transition: border-color 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .ml-panel textarea::placeholder {
+        color: #687f98;
+    }
+
+    .ml-panel textarea:focus {
+        border-color: #6aaeff;
+        background: #ffffff;
+        box-shadow: 0 0 0 4px rgba(106, 174, 255, 0.25);
+    }
+
+    .ml-panel input[type="url"] {
+        width: 100%;
+        padding: 16px 18px;
+        border-radius: 14px;
+        border: 1px solid #b8d8ff;
+        background: #ffffff;
+        color: #2c3e50;
+        font-size: 15px;
+        outline: none;
+        transition: border-color 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .ml-panel input[type="url"]::placeholder {
+        color: #687f98;
+    }
+
+    .ml-panel input[type="url"]:focus {
+        border-color: #6aaeff;
+        background: #ffffff;
+        box-shadow: 0 0 0 4px rgba(106, 174, 255, 0.25);
+    }
+
+    .ml-panel select {
+        width: 100%;
+        padding: 16px 18px;
+        border-radius: 14px;
+        border: 1px solid #b8d8ff;
+        background: #ffffff;
+        color: #2c3e50;
+        font-size: 15px;
+        outline: none;
+        transition: border-color 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .ml-panel select:focus {
+        border-color: #6aaeff;
+        background: #ffffff;
+        box-shadow: 0 0 0 4px rgba(106, 174, 255, 0.25);
+    }
+
+    .ml-panel .btn-submit {
+        width: 100%;
+        margin-top: 24px;
+        padding: 16px;
+        border-radius: 14px;
+        border: none;
+        cursor: pointer;
+        font-weight: 800;
+        color: white;
+        background: linear-gradient(135deg, #6eaef8, #4f8edb, #3f78c0);
+        box-shadow: 0 12px 28px rgba(79, 142, 219, 0.34);
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+        font-size: 15px;
+    }
+
+    .ml-panel .btn-submit:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 16px 36px rgba(99, 102, 241, 0.45);
+    }
+
+    .ml-panel .result-box {
+        margin-top: 28px;
+        padding: 20px 22px;
+        border-radius: 16px;
+        background: linear-gradient(135deg, rgba(34, 197, 94, 0.15), rgba(34, 197, 94, 0.06));
+        border: 1px solid rgba(34, 197, 94, 0.35);
+        animation: slideInUp 0.5s ease-out;
+    }
+
+    .ml-panel .result-box h2 {
+        margin: 0;
+        font-size: 22px;
+        font-weight: 800;
+        color: #86efac;
+    }
+
+    .ml-panel .err {
+        margin-top: 22px;
+        padding: 16px 18px;
+        border-radius: 14px;
+        background: linear-gradient(135deg, rgba(239, 68, 68, 0.15), rgba(220, 38, 38, 0.08));
+        border: 1px solid rgba(220, 38, 38, 0.35);
+        color: #fca5a5;
+        line-height: 1.6;
+        font-weight: 500;
+    }
+{% endblock %}
+
+{% block content %}
+<div class="ml-panel">
+    <h1>Customer Sentiment Analysis (Classic ML)</h1>
+    <p class="sub">Uses the trained scikit-learn model (<code style="color:#93c5fd;">model.pkl</code> + <code style="color:#93c5fd;">vectorizer.pkl</code>) from the analytics project.</p>
+    {% if free_remaining is not none and not session.get('user_id') %}
+        <div class="hint" style="margin-bottom: 18px; background: rgba(96, 165, 250, 0.12); border-color: rgba(96, 165, 250, 0.2); color: #1e3a8a;">
+            <b>Free trials:</b> You have <strong>{{ free_remaining }}</strong> free product-link analyses left. After that, you’ll need to <a href="{{ url_for('login') }}">log in</a>.
+        </div>
+    {% endif %}
+    <a class="back" href="/">← Back to SentimentPulse home</a>
+
+    <form method="post" id="analysis-form">
+        <label for="review">Review text</label>
+        <textarea id="review" name="review" placeholder="Enter product review" rows="6">{{ review | default('') }}</textarea>
+
+
+        <label for="product_url">Or product URL</label>
+        <input id="product_url" type="url" name="product_url" placeholder="https://example.com/product/..." />
+
+        <button class="btn-submit" type="submit" id="analyze-btn">Analyze</button>
+    </form>
+
+    {% if prediction %}
+    <div class="result-box">
+        <h2>Sentiment: {{ prediction }}</h2>
+    </div>
+    {% endif %}
+
+    {% if error %}
+    <div class="err">{{ error }}</div>
+    {% endif %}
+
+    {% if scrape_debug %}
+        <div class="hint" style="margin-top: 18px;">
+            <b>Scraper status:</b>
+            <pre style="margin: 10px 0 0; white-space: pre-wrap; font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace; font-size: 12px; color: #2c3e50;">{{ scrape_debug }}</pre>
+        </div>
+    {% endif %}
+</div>
+
+<script>
+document.getElementById('analysis-form').addEventListener('submit', function(e) {
+    const button = document.getElementById('analyze-btn');
+    
+    // Disable the button
+    button.disabled = true;
+    
+    // Change button text to show processing
+    button.textContent = 'Analyzing...';
+    
+    // Change button style to show it's disabled
+    button.style.opacity = '0.6';
+    button.style.cursor = 'not-allowed';
+    
+    // The form will still submit normally
+    // The button will remain disabled until page reloads
+});
+</script>
+
+{% endblock %}

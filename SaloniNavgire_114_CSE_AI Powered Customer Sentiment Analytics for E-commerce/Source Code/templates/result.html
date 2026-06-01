@@ -1,0 +1,170 @@
+{% extends "base.html" %}
+
+{% block title %}SentimentPulse — Text analysis result{% endblock %}
+
+{% block extra_styles %}
+    .wrap {
+        max-width: 800px;
+        margin: 48px auto;
+        animation: fadeInScale 0.8s ease-out;
+    }
+
+    .panel {
+        background: linear-gradient(135deg, rgba(139, 92, 246, 0.12), rgba(99, 102, 241, 0.08));
+        border: 1px solid rgba(148, 163, 184, 0.15);
+        border-radius: 20px;
+        padding: 36px;
+        box-shadow: 0 12px 40px rgba(0, 0, 0, 0.2);
+    }
+
+    .panel h1 {
+        font-size: 28px;
+        margin-bottom: 12px;
+        background: linear-gradient(135deg, #c4b5fd, #a5b4fc, #60a5fa);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        font-weight: 800;
+    }
+
+    .muted {
+        color: rgba(226, 232, 240, 0.75);
+        font-size: 14px;
+        line-height: 1.7;
+        margin-bottom: 18px;
+    }
+
+    .text-preview {
+        color: #0f172a;
+        background: rgba(255, 255, 255, 0.32);
+        border-radius: 14px;
+        padding: 14px 16px;
+        line-height: 1.75;
+        margin-bottom: 22px;
+        white-space: pre-wrap;
+        word-break: break-word;
+        border: 1px solid rgba(148, 163, 184, 0.24);
+    }
+
+    .error-box {
+        color: #fecaca;
+        background: rgba(127, 29, 29, 0.25);
+        border: 1px solid rgba(248, 113, 113, 0.35);
+        border-radius: 12px;
+        padding: 16px;
+        margin-bottom: 16px;
+    }
+
+    .emotion-main {
+        font-size: 22px;
+        font-weight: 700;
+        margin: 12px 0;
+        color: #111827;
+    }
+
+    .conf {
+        font-size: 15px;
+        color: #334155;
+        margin-bottom: 20px;
+    }
+
+    .bar-row {
+        margin: 14px 0;
+    }
+
+    .bar-label {
+        display: flex;
+        justify-content: space-between;
+        font-size: 15px;
+        color: #0f172a;
+        font-weight: 600;
+        margin-bottom: 6px;
+    }
+
+    .bar-track {
+        height: 14px;
+        border-radius: 999px;
+        background: rgba(148, 163, 184, 0.18);
+        overflow: hidden;
+    }
+
+    .bar-fill {
+        height: 100%;
+        border-radius: 999px;
+        background: linear-gradient(90deg, #8b5cf6, #6366f1);
+    }
+
+    .actions {
+        margin-top: 24px;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+    }
+
+    .actions a, .actions button {
+        display: inline-flex;
+        align-items: center;
+        padding: 10px 16px;
+        border-radius: 10px;
+        text-decoration: none;
+        font-weight: 700;
+        border: 1px solid rgba(15, 23, 40, 0.12);
+        background: rgba(255, 255, 255, 0.88);
+        color: #111827;
+        cursor: pointer;
+        font-family: inherit;
+        font-size: 14px;
+        transition: background 0.2s ease, color 0.2s ease, transform 0.2s ease;
+    }
+
+    .actions a:hover, .actions button:hover {
+        background: #e2e8f0;
+        color: #111827;
+        transform: translateY(-1px);
+    }
+{% endblock %}
+
+{% block content %}
+<div class="wrap">
+    <div class="panel">
+        <h1>Analysis result</h1>
+
+        {% if text_input %}
+            <p class="text-preview"><strong>Your text:</strong> {{ text_input }}</p>
+        {% endif %}
+
+        {% if confidence is none %}
+            <div class="error-box">{{ prediction }}</div>
+        {% else %}
+            <div class="emotion-main">Primary emotion: {{ prediction }}</div>
+            <div class="conf">Confidence: {{ confidence }}%</div>
+
+            {% if emotions and probs %}
+                <p class="muted">Top emotion scores</p>
+                {% for i in range(emotions|length) %}
+                    {% set emo = emotions[i] %}
+                    {% set p = probs[i] %}
+                    <div class="bar-row">
+                        <div class="bar-label">
+                            <span>{{ emo }}</span>
+                            <span>{{ '%.2f' % (p * 100) }}%</span>
+                        </div>
+                        <div class="bar-track">
+                            <div class="bar-fill" style="width: {{ (p * 100) | round(1) }}%;"></div>
+                        </div>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endif %}
+
+        <div class="actions">
+            <a href="{{ url_for('legacy_text_tool') }}">Analyze another message</a>
+            <a href="{{ url_for('home') }}">Home</a>
+            {% if analysis_id %}
+                <a href="{{ url_for('download_single_result', analysis_id=analysis_id) }}">Download JSON</a>
+                <a href="{{ url_for('download_single_result_pdf', analysis_id=analysis_id) }}">Download PDF</a>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
